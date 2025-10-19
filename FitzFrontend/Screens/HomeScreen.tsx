@@ -1,16 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { Colors } from '../../constants/Colours'; // Adjusted path
-import Card from '../../components/Card';       // Adjusted path
-import { Ionicons } from '@expo/vector-icons';
+import { Colors } from '../constants/Colours';
+import Card from '../components/Card';
+import { Ionicons } from '@expo/vector-icons'; // For icons
 
-export default function HomeScreen() { // Export as default for Expo Router
+const HomeScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
         <Text style={styles.header}>Today</Text>
 
-        {/* Sleep Score Card */}
+        {/* Sleep Score Card (referencing moodboard) */}
         <Card>
           <View style={styles.cardHeader}>
             <Ionicons name="moon" size={24} color={Colors.primaryText} />
@@ -25,7 +25,7 @@ export default function HomeScreen() { // Export as default for Expo Router
           </Text>
         </Card>
 
-        {/* Activity Summary Card */}
+        {/* Activity Summary Card (referencing moodboard) */}
         <Card>
           <View style={styles.cardHeader}>
             <Ionicons name="walk" size={24} color={Colors.primaryText} />
@@ -47,7 +47,7 @@ export default function HomeScreen() { // Export as default for Expo Router
           </View>
         </Card>
 
-        {/* Example of a Weight Card */}
+        {/* Example of a Weight Card (referencing moodboard) */}
         <Card>
           <View style={styles.cardHeader}>
             <Ionicons name="scale-outline" size={24} color={Colors.primaryText} />
@@ -57,6 +57,7 @@ export default function HomeScreen() { // Export as default for Expo Router
           <Text style={styles.secondaryText}>lbs</Text>
           <View style={styles.lineBreak} />
           <Text style={styles.smallText}>Target: 180 lbs in 8 weeks</Text>
+          {/* A simple progress bar */}
           <View style={styles.progressBarBackground}>
             <View style={[styles.progressBarFill, { width: '50%' }]} />
           </View>
@@ -65,7 +66,7 @@ export default function HomeScreen() { // Export as default for Expo Router
       </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -144,3 +145,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
 });
+
+export default HomeScreen;
