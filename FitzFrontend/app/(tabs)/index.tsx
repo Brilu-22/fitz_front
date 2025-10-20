@@ -1,13 +1,25 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
-import { Colors } from '../../constants/Colours'; // Adjusted path
-import Card from '../../components/Card';       // Adjusted path
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, Image } from 'react-native';
+import { Colors } from '../../constants/Colours';
+import Card from '../../components/Card';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function HomeScreen() { // Export as default for Expo Router
+export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
+        {/* Top Header with Image Placeholder, Name, and Calendar */}
+        <View style={styles.topHeaderContainer}>
+          <View style={styles.leftHeader}>
+            <Text style={styles.greetingText}>Thanks for Clocking It...</Text>
+            <View style={styles.profileSection}>
+              <View style={styles.imagePlaceholder} />
+              <Text style={styles.dummyName}>John Doe</Text>
+            </View>
+          </View>
+          <Ionicons name="calendar-outline" size={32} color={Colors.primaryText} />
+        </View>
+
         <Text style={styles.header}>Today</Text>
 
         {/* Sleep Score Card */}
@@ -76,12 +88,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  topHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    margin: 16,
+    marginTop: 20,
+  },
+  leftHeader: {
+    flexDirection: 'column',
+  },
+  greetingText: {
+    fontSize: 16,
+    color: Colors.secondaryText,
+    marginBottom: 4,
+  },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  imagePlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 8, // Slightly rounded corners for a modern look
+    backgroundColor: Colors.border, // A neutral color for the placeholder
+    marginRight: 10,
+  },
+  dummyName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Colors.primaryText,
+  },
   header: {
     fontSize: 32,
     fontWeight: 'bold',
     color: Colors.primaryText,
     margin: 16,
-    marginTop: 20,
+    marginTop: 20, // Keep existing margin for 'Today' header
   },
   cardHeader: {
     flexDirection: 'row',
