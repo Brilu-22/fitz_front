@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, Image } from 'react-native';
 import { Colors } from '../../constants/Colours';
 import Card from '../../components/Card';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function HomeScreen() {
+  const [currentDate, setCurrentDate] = useState('');
+
+  useEffect(() => {
+    const today = new Date();
+    const options: Intl.DateTimeFormatOptions = { weekday: 'short', month: 'short', day: 'numeric' };
+    setCurrentDate(today.toLocaleDateString('en-US', options));
+  }, []);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
@@ -17,7 +25,10 @@ export default function HomeScreen() {
               <Text style={styles.dummyName}>John Doe</Text>
             </View>
           </View>
-          <Ionicons name="calendar-outline" size={32} color={Colors.primaryText} />
+          <View style={styles.calendarSection}>
+            <Text style={styles.dateText}>{currentDate}</Text>
+            <Ionicons name="calendar-outline" size={32} color={Colors.primaryText} />
+          </View>
         </View>
 
         <Text style={styles.header}>Today</Text>
@@ -118,6 +129,15 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: Colors.primaryText,
+  },
+  calendarSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateText: {
+    fontSize: 16,
+    color: Colors.primaryText,
+    marginRight: 8,
   },
   header: {
     fontSize: 32,
