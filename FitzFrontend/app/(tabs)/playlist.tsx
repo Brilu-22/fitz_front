@@ -4,8 +4,9 @@ import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Ima
 import { Colors } from '../../constants/Colours';
 import Card from '../../components/Card';
 import { Ionicons } from '@expo/vector-icons';
-import { auth, db } from '../../firebaseConfig';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+// Comment out or remove these imports if you don't want Firebase to be compiled at all for dummy data mode
+// import { auth, db } from '../../firebaseConfig';
+// import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { router } from 'expo-router';
 
 interface Playlist {
@@ -17,48 +18,80 @@ interface Playlist {
   tracks_count: number;
 }
 
+// Dummy data for demonstration purposes
+const dummyPlaylists: Playlist[] = [
+  {
+    name: "Morning Energy Boost",
+    description: "Start your day with these upbeat tunes. Perfect for a morning run or intense cardio.",
+    spotify_url: "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M", // Example Spotify URL
+    image_url: "https://i.scdn.co/image/ab67706c0000da847f9c31402271cecb1662c16c", // Example image URL
+    owner: "Fitness App",
+    tracks_count: 45,
+  },
+  {
+    name: "Evening Chillout Flow",
+    description: "Relax and unwind with ambient and lo-fi beats. Great for stretching or meditation.",
+    spotify_url: "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+    image_url: "https://i.scdn.co/image/ab67706c0000da845c0879659e516382ac24227f",
+    owner: "Zen Master",
+    tracks_count: 30,
+  },
+  {
+    name: "Workout Power Hour",
+    description: "High-energy tracks to push you through your toughest workouts. EDM, Rock, and Hip-Hop.",
+    spotify_url: "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+    image_url: "https://i.scdn.co/image/ab67706c0000da84a95697666270b201f1f2e128",
+    owner: "Gym Beast",
+    tracks_count: 60,
+  },
+  {
+    name: "Yoga & Mindfulness",
+    description: "Soft melodies and instrumental pieces for your yoga session or mindful moments.",
+    spotify_url: "https://open.spotify.com/playlist/37i9dQZF1DXcBWIGoYBM5M",
+    image_url: "https://i.scdn.co/image/ab67706c0000da84c47ec945763b364491742460",
+    owner: "Inner Peace",
+    tracks_count: 25,
+  },
+];
+
+interface Track {
+  title: string;
+  artist: string;
+  albumArt?: string;
+}
+
+const dummyTracks: Track[] = [
+  { title: "Blinding Lights", artist: "The Weeknd", albumArt: "https://i.scdn.co/image/ab67616d0000b2734a625807462c01140996849a" },
+  { title: "Levitating", artist: "Dua Lipa", albumArt: "https://i.scdn.co/image/ab67616d0000b273d47c431b9d750c841362e5b7" },
+  { title: "Old Town Road", artist: "Lil Nas X ft. Billy Ray Cyrus", albumArt: "https://i.scdn.co/image/ab67616d0000b273d61b35b674846059d43509b5" },
+];
+
+
 export default function PlaylistScreen() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    const fetchLatestPlaylists = async () => {
+    // Simulate fetching data with a delay
+    const fetchDummyPlaylists = () => {
       setLoading(true);
       setError(null);
-      const currentUser = auth.currentUser;
 
-      if (!currentUser) {
-        setError("No user logged in to fetch playlists.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        // Query the latest plan for the user
-        const plansRef = collection(db, 'users', currentUser.uid, 'plans');
-        const q = query(plansRef, orderBy('generated_at', 'desc'), limit(1));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const latestPlan = querySnapshot.docs[0].data();
-          if (latestPlan && latestPlan.music_playlist_suggestions) {
-            setPlaylists(latestPlan.music_playlist_suggestions);
-          } else {
-            setError("No playlist suggestions found in the latest plan.");
-          }
-        } else {
-          setError("No fitness plans found. Generate a plan first!");
+      setTimeout(() => {
+        setPlaylists(dummyPlaylists);
+        // Automatically set the first dummy track as currently playing
+        if (dummyTracks.length > 0) {
+          setCurrentTrack(dummyTracks[0]);
+          setIsPlaying(true); // Start playing immediately
         }
-      } catch (err: any) {
-        console.error("Error fetching playlists:", err);
-        setError(`Failed to fetch playlists: ${err.message}`);
-      } finally {
         setLoading(false);
-      }
+      }, 1500); // 1.5 second delay
     };
 
-    fetchLatestPlaylists();
+    fetchDummyPlaylists();
   }, []);
 
   const openSpotifyLink = (url: string) => {
@@ -67,6 +100,10 @@ export default function PlaylistScreen() {
     // import { Linking } from 'react-native';
     // Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
     Alert.alert("Open Spotify", `Would open this playlist in Spotify: ${url}`);
+  };
+
+  const togglePlayPause = () => {
+    setIsPlaying(prev => !prev);
   };
 
   if (loading) {
@@ -86,7 +123,9 @@ export default function PlaylistScreen() {
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle-outline" size={32} color={Colors.red} />
           <Text style={styles.errorText}>{error}</Text>
-          <Text style={styles.smallText}>Make sure you've generated a plan from the backend.</Text>
+          <Text style={styles.smallText}>
+            This is a dummy error. In a real app, you might see a network issue or no plan generated.
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -130,9 +169,43 @@ export default function PlaylistScreen() {
           ))
         )}
       </ScrollView>
+// ... (previous code) ...
+
+      {/* Music Player Section */}
+      {currentTrack && (
+        <View style={styles.musicPlayerContainer}>
+          <View style={styles.progressBarWrapper}>
+            <View style={styles.progressBarBackground}>
+              {/* Removed the problematic comment here, or moved it */}
+              <View style={[styles.progressBarFill, { width: '40%' }]} /> 
+            </View>
+          </View>
+          <View style={styles.playerContent}>
+            {currentTrack.albumArt ? (
+              <Image source={{ uri: currentTrack.albumArt }} style={styles.albumArt} />
+            ) : (
+              <View style={styles.albumArtPlaceholder}>
+                <Ionicons name="musical-note" size={24} color={Colors.primaryText} />
+              </View>
+            )}
+            <View style={styles.trackInfo}>
+              <Text style={styles.trackTitle} numberOfLines={1}>{currentTrack.title}</Text>
+              <Text style={styles.trackArtist} numberOfLines={1}>{currentTrack.artist}</Text>
+            </View>
+            <TouchableOpacity onPress={togglePlayPause} style={styles.playPauseButton}>
+              <Ionicons name={isPlaying ? "pause-circle" : "play-circle"} size={45} color={Colors.primaryText} />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <Ionicons name="play-skip-forward" size={30} color={Colors.primaryText} />
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
+
+// ... (rest of the styles) ...
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -251,5 +324,76 @@ const styles = StyleSheet.create({
   },
   playIcon: {
     marginLeft: 10,
+  },
+  // Music Player Styles
+  musicPlayerContainer: {
+    backgroundColor: Colors.background, // A slightly different background for the player
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    position: 'absolute', // Stick to the bottom
+    bottom: 0,
+    left: 0,
+    right: 0,
+    elevation: 10, // For Android shadow
+    shadowColor: '#000', // For iOS shadow
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  progressBarWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3, // Thin progress bar
+    backgroundColor: 'transparent', // So the main background shows through
+  },
+  progressBarBackground: {
+    height: '100%',
+    backgroundColor: Colors.border,
+    borderRadius: 2,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: Colors.accent, // Use accent color for progress
+    borderRadius: 2,
+  },
+  playerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 5, // Space for the progress bar
+  },
+  albumArt: {
+    width: 50,
+    height: 50,
+    borderRadius: 6,
+    marginRight: 10,
+  },
+  albumArtPlaceholder: {
+    width: 50,
+    height: 50,
+    borderRadius: 6,
+    marginRight: 10,
+    backgroundColor: Colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  trackInfo: {
+    flex: 1,
+    marginRight: 10,
+  },
+  trackTitle: {
+    color: Colors.primaryText,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  trackArtist: {
+    color: Colors.secondaryText,
+    fontSize: 13,
+  },
+  playPauseButton: {
+    marginRight: 15,
   },
 });

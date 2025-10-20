@@ -43,6 +43,15 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
+          name="dietary-plan"
+          options={{
+            title: 'meals',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons name={focused ? 'person' : 'person-outline'} size={24} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="playlist" // New tab for playlists
           options={{
             title: 'Music',
@@ -60,6 +69,7 @@ export default function TabLayout() {
             ),
           }}
         />
+
       </Tabs>
     </>
   );
